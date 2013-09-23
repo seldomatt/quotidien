@@ -8,3 +8,5 @@ Feature:
   Fetching a random quote
 
     Given I launch the app
+    Then I touch "Random Quote!"
+    Then I should see "Generated Quote Text"
