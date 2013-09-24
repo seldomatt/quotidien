@@ -9,4 +9,8 @@ class Quote
     end
   end
 
+  def formatted_quote
+    "#{text}\n- #{author}"
+  end
+
 end

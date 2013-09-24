@@ -9,18 +9,33 @@ class FindQuoteController < UIViewController
   end
 
   layout :root do
-    subview(UIButton, :find_a_quote_button).on(:touch) do
+    @random_quote_button = subview(UIButton, :find_a_quote_button)
+  end
+
+  def layoutDidLoad
+    @random_quote_button.on(:touch) do
       get_random_quote_from_api do |quote_contents|
         set_quote(quote_contents)
+        show_quote
       end
     end
+  end
+
+  def show_quote
+    layout(view) do
+      @quote_text = subview(quote.formatted_quote.uilabel, :quote_label, alpha: 0.0)
+    end
+    view.apply_constraints
+    UIView.animateWithDuration(2.0, animations: lambda {
+      @quote_text.alpha = 1.0
+    })
   end
 
   def get_random_quote_from_api(&block)
     BW::HTTP.get("http://api.theysaidso.com/qod.json") do |response|
       if response.ok?
         result = BW::JSON.parse(response.body)
-        yield result["contents"]
+        block.call(result)
       end
     end
   end
@@ -46,5 +61,19 @@ Teacup::Stylesheet.new(:find_quote_controller) do
         backgroundColor: :white,
         color: "#74C0E2".uicolor,
         font: "HelveticaNeue-Light".uifont(24)
+
+  style :quote_label,
+        constraints: [
+          :center_x,
+          constrain_width(290),
+          constrain_below(:find_a_quote_button, 30),
+          constrain_height(200)
+        ],
+        font: "HelveticaNeue-Light".uifont(18),
+        color: :white,
+        accessibilityLabel: "Generated Quote Text",
+        numberOfLines: 0,
+        preferredMaxLayoutWidth: 290,
+        lineBreakMode: NSLineBreakByWordWrapping
 
 end
