@@ -4,10 +4,14 @@ class FindQuoteController < UIViewController
 
   stylesheet :find_quote_controller
 
+  def set_quote(quote_contents)
+    self.quote = Quote.from_json(quote_contents)
+  end
+
   layout :root do
     subview(UIButton, :find_a_quote_button).on(:touch) do
       get_random_quote_from_api do |quote_contents|
-        self.quote = quote_contents
+        set_quote(quote_contents)
       end
     end
   end
